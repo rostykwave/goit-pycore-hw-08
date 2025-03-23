@@ -2,6 +2,7 @@ from collections import UserDict
 import re
 from datetime import datetime, timedelta
 from typing import Tuple, List
+import pickle
 
 def input_error(func):
     def inner(*args, **kwargs):
@@ -210,14 +211,26 @@ def show_birthday(args, book: AddressBook):
 def birthdays(_, book: AddressBook):
     return book.get_upcoming_birthdays()
 
+def save_data(book, filename="addressbook.pkl"):
+    with open(filename, "wb") as f:
+        pickle.dump(book, f)
+
+def load_data(filename="addressbook.pkl"):
+    try:
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return AddressBook()
+
 def main():
-    book = AddressBook()
+    book = load_data()
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
         command, args = parse_input(user_input)
 
         if command in ["close", "exit"]:
+            save_data(book)
             print("Good bye!")
             break
         elif command == "hello":
